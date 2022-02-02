@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # name of the deployment
+  name: moderation-depl
+spec:
+  # no of containers to be made
+  replicas: 1
+  selector:
+    # will looks for the template with app: moderation
+    matchLabels:
+      app: moderation
+  template:
+    metadata:
+      labels:
+        app: moderation
+    spec:
+      containers:
+        - name: moderation
+          # never use :<specific-version>, use :latest instead
+          # image: hstha/microservice/blog/moderation:0.0.1
+          image: hstha/microservice/blog/moderation:latest
+
+          # after you update the image than run
+          # kutectl rollout restart deployment <deployment-name>
+
+---
+# Node Port Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: moderation-cluster-ip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: moderation
+  ports:
+    - name: moderation
+      portocol: TCP
+      port: 4003 # node port
+      targetPort: 4003 # target where your server is running

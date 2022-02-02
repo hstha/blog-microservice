@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # name of the deployment
+  name: event-bus-depl
+spec:
+  # no of containers to be made
+  replicas: 1
+  selector:
+    # will looks for the template with app: event-bus
+    matchLabels:
+      app: event-bus
+  template:
+    metadata:
+      labels:
+        app: event-bus
+    spec:
+      containers:
+        - name: event-bus
+          # never use :<specific-version>, use :latest instead
+          # image: hstha/microservice/blog/event-bus:0.0.1
+          image: hstha/microservice/blog/event-bus:latest
+
+          # after you update the image than run
+          # kutectl rollout restart deployment <deployment-name>
+
+---
+# Node Port Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-bus-cluster-ip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: event-bus
+  ports:
+    - name: event-bus
+      portocol: TCP
+      port: 4005 # node port
+      targetPort: 4005 # target where your server is running

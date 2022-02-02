@@ -1,0 +1,31 @@
+# creating a ingress configuration for defining the rules to map different routes from UI to backend
+# to run ingress you need to have load-balancer
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    ngnix.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    # this means our domain is blog.com which contains both frontend and backend
+    - host: blog.com
+      http:
+        paths:
+          - path: /post/create
+            backend:
+              serviceName: posts-cluster-ip-srv
+              servicePort: 4000
+          - path: /posts
+            backend:
+              serviceName: query-cluster-ip-srv
+              servicePort: 4002
+          - path: /posts/?(.*)/comments
+            backend:
+              serviceName: comments-cluster-ip-srv
+              servicePort: 4001
+          - path: /?(.*)
+            backend:
+              serviceName: client-cluster-ip-srv
+              servicePort: 3000

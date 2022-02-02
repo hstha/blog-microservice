@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # name of the deployment
+  name: posts-depl
+spec:
+  # no of containers to be made
+  replicas: 1
+  selector:
+    # will looks for the template with app: posts
+    matchLabels:
+      app: posts
+  template:
+    metadata:
+      labels:
+        app: posts
+    spec:
+      containers:
+        - name: posts
+          # never use :<specific-version>, use :latest instead
+          # image: hstha/microservice/blog/posts:0.0.1
+          image: hstha/microservice/blog/posts:latest
+
+          # after you update the image than run
+          # kutectl rollout restart deployment <deployment-name>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-node-port-srv
+spec:
+  type: NodePort
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      protocol: TCP
+      port: 4000
+      targetPort: 4000
+
+---
+# Node Port Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-cluster-ip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: posts
+  ports:
+    - name: posts
+      portocol: TCP
+      port: 4000 # node port
+      targetPort: 4000 # target where your server is running

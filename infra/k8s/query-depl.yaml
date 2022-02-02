@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # name of the deployment
+  name: query-depl
+spec:
+  # no of containers to be made
+  replicas: 1
+  selector:
+    # will looks for the template with app: query
+    matchLabels:
+      app: query
+  template:
+    metadata:
+      labels:
+        app: query
+    spec:
+      containers:
+        - name: query
+          # never use :<specific-version>, use :latest instead
+          # image: hstha/microservice/blog/query:0.0.1
+          image: hstha/microservice/blog/query:latest
+
+          # after you update the image than run
+          # kutectl rollout restart deployment <deployment-name>
+
+---
+# Node Port Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: query-cluster-ip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: query
+  ports:
+    - name: query
+      portocol: TCP
+      port: 4002 # node port
+      targetPort: 4002 # target where your server is running

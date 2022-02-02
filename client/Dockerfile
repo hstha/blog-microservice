@@ -1,3 +1,4 @@
+# microservice/blog/client
 FROM node:alpine
 
 WORKDIR /home/client

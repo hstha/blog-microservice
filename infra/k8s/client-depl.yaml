@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # name of the deployment
+  name: client-depl
+spec:
+  # no of containers to be made
+  replicas: 1
+  selector:
+    # will looks for the template with app: client
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          # never use :<specific-version>, use :latest instead
+          # image: hstha/microservice/blog/client:0.0.1
+          image: hstha/microservice/blog/client:latest
+
+          # after you update the image than run
+          # kutectl rollout restart deployment <deployment-name>
+
+---
+# Node Port Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-cluster-ip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: client
+  ports:
+    - name: client
+      portocol: TCP
+      port: 3000 # node port
+      targetPort: 3000 # target where your server is running
